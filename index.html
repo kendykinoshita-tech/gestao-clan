@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RK IT Solutions - Gestão de Clã</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { border-bottom: 2px solid #38bdf8; padding-bottom: 10px; color: #38bdf8; }
+        .membro-card { background: #1e293b; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #ef4444; }
+        .membro-card.check { border-left-color: #22c55e; }
+        .info { display: flex; flex-direction: column; }
+        .name { font-weight: bold; font-size: 1.1rem; }
+        .role { font-size: 0.85rem; color: #94a3b8; }
+        button { background: #38bdf8; color: #0f172a; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #7dd3fc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Entrada - WhatsApp</h1>
+        <div id="lista">Carregando membros...</div>
+    </div>
+
+    <script>
+        const WORKER_URL = "https://proxy-clash-rodrigo.kendykinoshita.workers.dev";
+
+        async function buscarMembros() {
+            try {
+                const response = await fetch(WORKER_URL);
+                const data = await response.json();
+                const listaDiv = document.getElementById('lista');
+                listaDiv.innerHTML = '';
+
+                data.items.forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = 'membro-card';
+                    card.innerHTML = `
+                        <div class="info">
+                            <span class="name">${m.name}</span>
+                            <span class="role">${m.role}</span>
+                        </div>
+                        <button onclick="marcar(this)">Marcar Whats</button>
+                    `;
+                    listaDiv.appendChild(card);
+                });
+            } catch (e) {
+                document.getElementById('lista').innerHTML = "Erro ao carregar. Verifique o IP na Supercell.";
+            }
+        }
+
+        function marcar(btn) {
+            const card = btn.parentElement;
+            card.classList.toggle('check');
+            btn.innerText = card.classList.contains('check') ? "OK" : "Marcar Whats";
+        }
+
+        buscarMembros();
+    </script>
+</body>
+</html>
