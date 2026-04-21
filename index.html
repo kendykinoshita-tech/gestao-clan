@@ -23,32 +23,43 @@
         <div id="lista">Carregando membros...</div>
     </div>
 
-    <script>
-        const WORKER_URL = "https://proxy-clash-rodrigo.kendykinoshita.workers.dev";
-
-        async function buscarMembros() {
-            try {
-                const response = await fetch(WORKER_URL);
-                const data = await response.json();
-                const listaDiv = document.getElementById('lista');
-                listaDiv.innerHTML = '';
-
-                data.items.forEach(m => {
-                    const card = document.createElement('div');
-                    card.className = 'membro-card';
-                    card.innerHTML = `
-                        <div class="info">
-                            <span class="name">${m.name}</span>
-                            <span class="role">${m.role}</span>
-                        </div>
-                        <button onclick="marcar(this)">Marcar Whats</button>
-                    `;
-                    listaDiv.appendChild(card);
-                });
-            } catch (e) {
-                document.getElementById('lista').innerHTML = "Erro ao carregar. Verifique o IP na Supercell.";
+        <script>
+            const WORKER_URL = "https://proxy-clash-rodrigo.kendykinoshita.workers.dev";
+    
+            async function buscarMembros() {
+        try {
+            // Adicionamos um número aleatório no fim para evitar que o navegador use o erro antigo salvo (cache)
+            const response = await fetch(WORKER_URL + "?v=" + Math.random());
+            const data = await response.json();
+            
+            const listaDiv = document.getElementById('lista');
+            listaDiv.innerHTML = '';
+    
+            // O cocproxy entrega a lista direto no array ou em .items
+            const membros = Array.isArray(data) ? data : data.items;
+    
+            if (!membros) {
+                listaDiv.innerHTML = "Dados recebidos, mas formato desconhecido.";
+                return;
             }
+    
+            membros.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'membro-card';
+                card.innerHTML = `
+                    <div class="info">
+                        <span class="name">${m.name}</span>
+                        <span class="role">${m.role}</span>
+                    </div>
+                    <button onclick="marcar(this)">Marcar Whats</button>
+                `;
+                listaDiv.appendChild(card);
+            });
+        } catch (e) {
+            console.error(e);
+            document.getElementById('lista').innerHTML = "Erro ao processar dados. Verifique o console.";
         }
+    }
 
         function marcar(btn) {
             const card = btn.parentElement;
